@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block body_block %}
+{% if messages %}
+{% for message in messages %}
+  <div class="alert {% if message.tags == 'error' %} alert alert-danger {% else %}alert-{{message.tags}}{% endif %}  alert-dismissible fade show mt-2" role="alert">
+    <strong>{{ message }}</strong>.
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+{% endfor %}
+{% endif %}
+<div class="row mt-2">
+    {% for recipe in recipes %} 
+    <div class="col-12 col-sm-8 col-md-6 col-lg-3 mt-2">
+        <div class="card mx-3" style="width: 323px; height: 740px;">
+            <img class="card-img" style="width: 324px; height: 432px;" src="/media/{{MEDIA_URL}}{{recipe.image}}" alt="Bologna">
+            <div class="card-img-overlay">
+                <a href="{% url 'edit_recipe_details' recipe.id %}" class="btn btn-light btn-sm">{{recipe.title}}</a>
+            </div>
+            <div class="card-body">
+                    <div class="title-block" style="height: 50px;">
+                    <h4 class="card-title">{{recipe.title}}</h4>
+                    </div>
+                <hr>
+                <div style="height: 65px;">
+                <p class="card-text mt-1">{{recipe.description|truncatewords:50}}</p>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

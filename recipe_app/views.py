@@ -14,6 +14,28 @@ def home_view(request):
     return render(request, "home.html", context={"recipes": recipes})
 
 
+def user_post_list(request):
+    user = request.user
+    recipes = Recipe.objects.filter(posted_by=user)
+    return render(request, "user_posts_list.html", context={"recipes": recipes})
+
+
+def edit_recipe_details(request, id):
+    recipe = Recipe.objects.get(id=id)
+    if request.method == "POST":
+        title = request.POST.get("title")
+        image = request.FILES.get("new_image")
+        description = request.POST.get("description")
+        if image and image.size > 0:
+            recipe.image = image
+        recipe.title = title
+        recipe.description = description
+        recipe.save()
+        messages.success(request, "Recipe updated successfully")
+        return redirect("/recipe_world/post-list")
+    return render(request, "edit_post.html", context={"recipe": recipe})
+
+
 def recipe_details(request, id):
     recipe = Recipe.objects.get(id=id)
     return render(request, "post_details.html", context={"recipe": recipe})
