@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<div class="container">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="post-container">
+          <h1 class="post-title">{{recipe.title}}</h1>
+          <img style="width: 712px; height: 550px;" src="/media/{{MEDIA_URL}}{{recipe.image}}" alt="Post Image" class="post-image">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-6">
+                <p><strong>Posted By: </strong>{{recipe.posted_by.first_name}} {{recipe.posted_by.last_name}}</p>
+              </div>
+              <div class="col-md-6">
+                <p><strong>Posted on : </strong>{{recipe.created_at}}</p>
+              </div>
+            </div>
+          </div>
+          <p class="post-description">{{recipe.description}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  
+  {% endblock %}

@@ -3,10 +3,24 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Q
 from django.contrib.auth import authenticate, login
+from .models import Recipe
+from django.contrib.auth import logout
 
 
 def home_view(request):
-    return render(request, "home.html")
+    recipes = Recipe.objects.select_related().all()
+    return render(request, "home.html", context={"recipes": recipes})
+
+
+def recipe_details(request, id):
+    recipe = Recipe.objects.get(id=id)
+    return render(request, "post_details.html", context={"recipe": recipe})
+
+
+def user_logout_view(request):
+    logout(request)
+    messages.success(request, "Logout successfully")
+    return redirect("/recipe_world/login/")  # Redirect to the login page after logout
 
 
 # Create your views here.
