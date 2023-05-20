@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block body_block %}
+<section class="vh-100">
+      <div class="container py-5 h-100">
+        <div class="row d-flex align-items-center justify-content-center h-100">
+          <div class="col-md-8 col-lg-7 col-xl-6">
+            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg" class="img-fluid" alt="Phone image" />
+          </div>
+          <div class="col-md-7 col-lg-5 col-xl-5 offset-xl-1">
+            <form method="post">
+              {% csrf_token %}
+              {% if messages %}
+              {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %} alert alert-danger {% else %} alert-{{message.tags}} {% endif %}alert-dismissible fade show" role="alert">
+                  <strong>{{ message }}</strong>.
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+              {% endif %}
+              <div class="form-outline mb-2">
+                <label class="form-label" for="firstname-form">First name<span class="required-field">*</span></label>
+                <input type="text" name="first_name" id="firstname-form" class="form-control form-control-lg" autocomplete="off" />
+              </div>
+              <div class="form-outline mb-2">
+                <label class="form-label" for="lastname-form">Last name<span class="required-field">*</span></label>
+                <input type="text" name="last_name" id="lastname-form" class="form-control form-control-lg" autocomplete="off" />
+              </div>
+              <div class="form-outline mb-2">
+                <label class="form-label" for="username-form">Username<span class="required-field">*</span></label>
+                <input type="text" name="username" id="username-form" class="form-control form-control-lg" autocomplete="off" />
+              </div>
+
+              <div class="form-outline mb-2">
+                <label class="form-label" for="email-form">Email<span class="required-field">*</span></label>
+                <input type="email" name="email" id="email-form" class="form-control form-control-lg" autocomplete="off" />
+              </div>
+
+              <!-- Password input -->
+              <div class="form-outline mb-2">
+                <label class="form-label" for="password">Password<span class="required-field">*</span></label>
+                <input type="password" name="password" id="password" class="form-control form-control-lg" />
+              </div>
+              <p>Already have an account ?<a href="{% url 'user_login' %}"> Login</a></p>
+              <button type="submit" class="btn btn-primary btn-lg btn-block">Sign up</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    {% endblock %}
