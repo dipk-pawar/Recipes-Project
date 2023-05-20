@@ -5,6 +5,8 @@ from django.db.models import Q
 from django.contrib.auth import authenticate, login
 from .models import Recipe
 from django.contrib.auth import logout
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.decorators import login_required
 
 
 def home_view(request):
@@ -21,6 +23,39 @@ def user_logout_view(request):
     logout(request)
     messages.success(request, "Logout successfully")
     return redirect("/recipe_world/login/")  # Redirect to the login page after logout
+
+
+@login_required
+def change_password(request):
+    if request.method != "POST":
+        return render(request, "change_password.html")
+    current_password = request.POST.get("current_password")
+    new_password = request.POST.get("new_password")
+    confirm_new_password = request.POST.get("confirm_new_password")
+    if (
+        not current_password.strip()
+        or not new_password.strip()
+        or not confirm_new_password.strip()
+    ):
+        messages.error(request, "Please fill the required fields")
+        return redirect("/recipe_world/change-password/")
+    user = request.user
+    if not user.check_password(current_password):
+        messages.error(request, "Invalid current password")
+        return redirect("/recipe_world/change-password/")
+    if new_password != confirm_new_password:
+        messages.error(request, "Sorry, new password didn't matched")
+        return redirect("/recipe_world/change-password/")
+
+    # Update the user's password
+    user.set_password(new_password)
+    user.save()
+
+    # Update the session authentication hash
+    update_session_auth_hash(request, user)
+    logout(request)
+    messages.success(request, "Password changes successfully, Please login again")
+    return redirect("/recipe_world/login/")
 
 
 # Create your views here.
