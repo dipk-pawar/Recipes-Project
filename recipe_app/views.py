@@ -7,6 +7,8 @@ from .models import Recipe
 from django.contrib.auth import logout
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.views import View
+from django.utils.decorators import method_decorator
 
 
 def home_view(request):
@@ -14,33 +16,77 @@ def home_view(request):
     return render(request, "home.html", context={"recipes": recipes})
 
 
-def user_post_list(request):
-    user = request.user
-    recipes = Recipe.objects.filter(posted_by=user)
-    return render(request, "user_posts_list.html", context={"recipes": recipes})
-
-
-def edit_recipe_details(request, id):
-    recipe = Recipe.objects.get(id=id)
-    if request.method == "POST":
-        title = request.POST.get("title")
-        image = request.FILES.get("new_image")
-        description = request.POST.get("description")
-        if image and image.size > 0:
-            recipe.image = image
-        recipe.title = title
-        recipe.description = description
-        recipe.save()
-        messages.success(request, "Recipe updated successfully")
-        return redirect("/recipe_world/post-list")
-    return render(request, "edit_post.html", context={"recipe": recipe})
-
-
 def recipe_details(request, id):
     recipe = Recipe.objects.get(id=id)
     return render(request, "post_details.html", context={"recipe": recipe})
 
 
+class UserPostAPIView(View):
+    def get(self, request):
+        user = request.user
+        recipes = Recipe.objects.filter(posted_by=user)
+        return render(request, "user_posts_list.html", context={"recipes": recipes})
+
+    def post(self, request):
+        user = request.user
+        search_key = request.POST.get("search")
+        recipes = Recipe.objects.filter(posted_by=user, title__contains=search_key)
+        return render(request, "user_posts_list.html", context={"recipes": recipes})
+
+
+@method_decorator(login_required, name="dispatch")
+class UserPostGetandSaveAPIView(View):
+    def get(self, request):
+        return render(request, "create_post.html")
+
+    def post(self, request):
+        title = request.POST.get("title")
+        image = request.FILES.get("new_image")
+        description = request.POST.get("description")
+        if image is None:
+            messages.error(request, "Please fill the required fields")
+            return redirect("/recipe_world/post-list")
+        user = request.user
+        recipe = Recipe.objects.create(
+            title=title, image=image, description=description, posted_by=user
+        )
+        recipe.save()
+        messages.success(request, "Recipe saved successfully")
+        return redirect("/recipe_world/post-list")
+
+
+@method_decorator(login_required, name="dispatch")
+class UserPostDetailAPIView(View):
+    def get(self, request, id):
+        try:
+            recipe = Recipe.objects.get(id=id)
+        except Exception:
+            messages.error(request, "Sorry, Recipe not found")
+            return redirect("/recipe_world/post-list")
+        return render(request, "edit_post.html", context={"recipe": recipe})
+
+    def post(self, request, id):
+        if request.POST.get("_method") == "PUT":
+            recipe = Recipe.objects.get(id=id)
+            title = request.POST.get("title")
+            image = request.FILES.get("new_image")
+            description = request.POST.get("description")
+            if image is not None:
+                recipe.image = image
+            recipe.title = title
+            recipe.description = description
+            recipe.save()
+            messages.success(request, "Recipe updated successfully")
+        elif request.POST.get("_method") == "DELETE":
+            if recipe := Recipe.objects.filter(id=id):
+                recipe.delete()
+                messages.success(request, "Recipe deleted successfully")
+            else:
+                messages.error(request, "Sorry, Recipe not found")
+        return redirect("/recipe_world/post-list")
+
+
+@login_required
 def user_logout_view(request):
     logout(request)
     messages.success(request, "Logout successfully")
@@ -100,7 +146,7 @@ def user_login_view(request):
             return redirect("/recipe_world/login/")
         else:
             login(request, user)
-            return redirect("/recipe_world/")
+            return redirect("/recipe_world/post-list")
 
     return render(request, "login.html")
 

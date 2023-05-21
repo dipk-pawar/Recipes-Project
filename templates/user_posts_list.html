@@ -16,7 +16,7 @@
         <div class="card mx-3" style="width: 323px; height: 740px;">
             <img class="card-img" style="width: 324px; height: 432px;" src="/media/{{MEDIA_URL}}{{recipe.image}}" alt="Bologna">
             <div class="card-img-overlay">
-                <a href="{% url 'edit_recipe_details' recipe.id %}" class="btn btn-light btn-sm">{{recipe.title}}</a>
+                <p><a href="{% url 'edit_recipe_details' recipe.id %}" class="btn btn-primary btn-sm">{{recipe.title}}</a></p>   
             </div>
             <div class="card-body">
                     <div class="title-block" style="height: 50px;">
@@ -25,7 +25,6 @@
                 <hr>
                 <div style="height: 65px;">
                 <p class="card-text mt-1">{{recipe.description|truncatewords:50}}</p>
-                
                 </div>
             </div>
         </div>
