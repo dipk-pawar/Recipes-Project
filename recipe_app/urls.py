@@ -17,7 +17,4 @@ urlpatterns = [
     path(
         "get-or-create", UserPostGetandSaveAPIView.as_view(), name="get_or_create_post"
     ),
-    path(
-        "get-or-create", UserPostGetandSaveAPIView.as_view(), name="get_or_create_post"
-    ),
 ]

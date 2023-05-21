@@ -21,6 +21,7 @@ def recipe_details(request, id):
     return render(request, "post_details.html", context={"recipe": recipe})
 
 
+@method_decorator(login_required, name="dispatch")
 class UserPostAPIView(View):
     def get(self, request):
         user = request.user
